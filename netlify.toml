@@ -1,0 +1,12 @@
+[build]
+  functions = "netlify/functions"
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+
+# L'analisi AI di 20 lead può richiedere tempo: timeout esteso (piano Pro)
+[functions."analizza"]
+  timeout = 26
