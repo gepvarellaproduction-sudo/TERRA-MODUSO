@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terra — Lead Agent · Moduso</title>
+<meta name="description" content="Trova clienti B2B reali su Google Maps e ricevi un dossier commerciale su misura per ogni lead.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#0A0A0A; --ivory:#F5F5F0; --ivory-dark:#ECECE5; --white:#FFFFFF;
+  --terra:#1A4E7A; --terra-light:#7FD4E8; --terra-soft:#E8F4FA;
+  --pulse:#6E6BFF; --signal:#C8FF57;
+  --muted:#6B6B66; --border:#E8E8E3; --border-light:#F0F0EB;
+  --radius:14px; --radius-sm:10px;
+  --shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 16px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 24px rgba(0,0,0,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--ivory);color:var(--void);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3{letter-spacing:-0.02em;font-weight:800}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px}
+a{color:var(--terra)}
+
+/* TOPBAR */
+.topbar{background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border-light);height:62px;display:flex;align-items:center;padding:0 1.5rem;gap:1rem;position:sticky;top:0;z-index:100}
+.logo{font-size:1.05rem;font-weight:900;letter-spacing:-0.02em;text-decoration:none;color:var(--void)}
+.logo span{color:var(--terra)}
+.logo-tag{font-size:0.78rem;font-weight:600;color:var(--muted);padding-left:0.9rem;border-left:1px solid var(--border)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:0.6rem}
+
+/* BTN */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;padding:0.65rem 1.2rem;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;border:none;transition:all 0.15s;text-decoration:none;white-space:nowrap;letter-spacing:-0.01em}
+.btn-primary{background:var(--terra);color:#fff}
+.btn-primary:hover{background:#143d5f;transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.btn-dark{background:var(--void);color:var(--ivory)}
+.btn-dark:hover{background:#1a1a1a}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--void);color:var(--void)}
+.btn-sm{padding:0.45rem 0.9rem;font-size:0.75rem}
+.btn-lg{padding:0.85rem 1.75rem;font-size:0.88rem}
+.btn-full{width:100%}
+
+.wrap{max-width:1200px;margin:0 auto;padding:2rem 1.5rem}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:1.5rem;align-items:start}
+
+/* PANNELLO BRIEF */
+.brief{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;position:sticky;top:80px}
+.brief-title{font-size:1.05rem;font-weight:800;margin-bottom:0.3rem}
+.brief-title span{color:var(--terra)}
+.brief-sub{font-size:0.78rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.5}
+.field{margin-bottom:1.1rem}
+.field-label{display:block;font-size:0.65rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem}
+.field-input,.field-textarea,.field-select{width:100%;background:var(--ivory);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.7rem 0.85rem;font-family:'Inter',sans-serif;font-size:0.85rem;color:var(--void);outline:none;transition:border-color 0.15s}
+.field-input:focus,.field-textarea:focus,.field-select:focus{border-color:var(--terra);background:var(--white)}
+.field-textarea{resize:vertical;min-height:80px;line-height:1.55}
+.field-hint{font-size:0.7rem;color:var(--muted);margin-top:0.3rem;line-height:1.4}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
+
+/* RISULTATI */
+.panel{min-height:400px}
+.empty{background:var(--white);border:1px dashed var(--border);border-radius:var(--radius);padding:4rem 2rem;text-align:center}
+.empty-icon{width:64px;height:64px;border-radius:18px;background:var(--terra-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:28px}
+.empty-title{font-size:1.25rem;font-weight:800;margin-bottom:0.4rem}
+.empty-sub{font-size:0.85rem;color:var(--muted);max-width:420px;margin:0 auto;line-height:1.6}
+
+.loader{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:4rem 2rem;text-align:center;display:none}
+.loader.on{display:block}
+.loader-ring{width:38px;height:38px;border:2.5px solid var(--border);border-top-color:var(--terra);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 1.25rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-txt{font-size:0.9rem;font-weight:600}
+
+.results-head{display:none;align-items:center;gap:1rem;margin-bottom:1rem}
+.results-head.on{display:flex}
+.results-count{font-size:0.85rem;font-weight:600}
+.results-count strong{color:var(--terra)}
+.results-actions{margin-left:auto;display:flex;gap:0.5rem}
+
+/* CARD LEAD */
+.lead{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.4rem;margin-bottom:0.875rem;transition:border-color 0.15s,box-shadow 0.15s}
+.lead:hover{border-color:var(--terra-light);box-shadow:var(--shadow)}
+.lead-top{display:flex;align-items:flex-start;gap:1rem;margin-bottom:0.75rem}
+.lead-info{flex:1;min-width:0}
+.lead-nome{font-size:1rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:0.2rem}
+.lead-meta{font-size:0.75rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:0.5rem 0.9rem;align-items:center}
+.lead-meta a{color:var(--terra);text-decoration:none}
+.lead-meta a:hover{text-decoration:underline}
+.lead-score{flex-shrink:0;text-align:center;min-width:54px}
+.lead-score-num{font-size:1.5rem;font-weight:900;line-height:1;letter-spacing:-0.03em}
+.lead-score-num.high{color:var(--terra)}
+.lead-score-num.mid{color:#d98a00}
+.lead-score-num.low{color:var(--muted)}
+.lead-score-lbl{font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.lead-dim{display:inline-block;font-size:0.68rem;font-weight:700;color:var(--terra);background:var(--terra-soft);padding:0.2rem 0.6rem;border-radius:100px;margin-bottom:0.6rem}
+.lead-dossier{font-size:0.85rem;line-height:1.6;color:#3a3a3a;background:var(--ivory);border-radius:10px;padding:0.8rem 1rem;border-left:3px solid var(--terra-light)}
+.lead-stars{color:#d98a00;letter-spacing:1px}
+
+.badge{display:inline-flex;align-items:center;gap:0.3rem;padding:0.15rem 0.5rem;border-radius:100px;font-size:0.62rem;font-weight:700}
+.badge-nosite{background:#fff0f0;color:#c0392b}
+.badge-site{background:var(--terra-soft);color:var(--terra)}
+
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(12px);background:var(--void);color:var(--ivory);padding:0.65rem 1.25rem;border-radius:var(--radius-sm);font-size:0.78rem;font-weight:600;z-index:300;opacity:0;transition:all 0.22s;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.err{background:#dc2626}
+.err-box{background:#fff0f0;border:1px solid #f5c6c6;color:#c0392b;border-radius:var(--radius-sm);padding:0.8rem 1rem;font-size:0.82rem;margin-bottom:1rem;display:none}
+.err-box.on{display:block}
+
+@media(max-width:880px){
+  .layout{grid-template-columns:1fr}
+  .brief{position:static}
+  .field-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="#" class="logo">MODUSO<span>.</span></a>
+  <span class="logo-tag">Terra · Lead Agent</span>
+  <div class="topbar-right">
+    <span style="font-size:0.72rem;color:var(--muted)">🌍 Ricerca clienti B2B</span>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+
+    <!-- BRIEF -->
+    <aside class="brief">
+      <div class="brief-title">Trova i tuoi <span>clienti</span></div>
+      <div class="brief-sub">Dicci cosa vendi e chi cerchi. Terra trova attività reali su Google Maps e ti dà un dossier commerciale per ognuna.</div>
+
+      <div class="err-box" id="errBox"></div>
+
+      <div class="field">
+        <label class="field-label">La tua azienda</label>
+        <input type="text" class="field-input" id="f_nome" placeholder="es. AcquaPura Srl">
+      </div>
+      <div class="field">
+        <label class="field-label">Cosa vendi / offri *</label>
+        <textarea class="field-textarea" id="f_offerta" placeholder="es. Impianti di depurazione e addolcimento dell'acqua per attività"></textarea>
+      </div>
+      <div class="field">
+        <label class="field-label">Chi cerchi (categoria) *</label>
+        <input type="text" class="field-input" id="f_categoria" placeholder="es. ristoranti, hotel, palestre">
+        <div class="field-hint">La categoria di attività che vuoi trovare su Google Maps.</div>
+      </div>
+      <div class="field">
+        <label class="field-label">Città / zona *</label>
+        <input type="text" class="field-input" id="f_citta" placeholder="es. Bari">
+      </div>
+      <div class="field">
+        <label class="field-label">Il tuo cliente ideale (facoltativo)</label>
+        <textarea class="field-textarea" id="f_ideale" placeholder="es. attività medio-grandi, con alto afflusso di clienti e consumi elevati"></textarea>
+        <div class="field-hint">Aiuta Terra a dare uno score più preciso.</div>
+      </div>
+
+      <button class="btn btn-primary btn-full btn-lg" id="btnCerca" onclick="cerca()">Trova lead →</button>
+    </aside>
+
+    <!-- RISULTATI -->
+    <main class="panel">
+      <div class="empty" id="emptyState">
+        <div class="empty-icon">🌍</div>
+        <div class="empty-title">I tuoi prossimi clienti, qualificati.</div>
+        <div class="empty-sub">Compila il brief a sinistra. Terra cerca attività reali su Google Maps, calcola quanto ognuna è un buon lead per quello che vendi, e ti prepara un dossier commerciale pronto per il venditore.</div>
+      </div>
+
+      <div class="loader" id="loaderState">
+        <div class="loader-ring"></div>
+        <div class="loader-txt" id="loaderTxt">Ricerca in corso…</div>
+      </div>
+
+      <div class="results-head" id="resultsHead">
+        <div class="results-count">Trovati <strong id="leadCount">0</strong> lead qualificati</div>
+        <div class="results-actions">
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button>
+        </div>
+      </div>
+
+      <div id="leadList"></div>
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════ STATO ══════════
+let leadsData = [];
+
+// ══════════ RICERCA ══════════
+async function cerca(){
+  const nomeAzienda = document.getElementById('f_nome').value.trim();
+  const offerta = document.getElementById('f_offerta').value.trim();
+  const categoria = document.getElementById('f_categoria').value.trim();
+  const citta = document.getElementById('f_citta').value.trim();
+  const clienteIdeale = document.getElementById('f_ideale').value.trim();
+
+  if(!offerta){ err('Descrivi cosa vendi.'); return; }
+  if(!categoria || !citta){ err('Inserisci categoria e città.'); return; }
+  hideErr();
+
+  const profilo = { nomeAzienda, offerta, categoria, citta, clienteIdeale };
+
+  setLoading(true, 'Ricerca attività su Google Maps…');
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('resultsHead').classList.remove('on');
+  document.getElementById('leadList').innerHTML='';
+  leadsData = [];
+
+  try{
+    // STEP 1 — Google Places (function TERRA, max 2 pagine)
+    let places = [];
+    let pageToken = null, pagine = 0;
+    do{
+      const resp = await fetch('/.netlify/functions/places', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ query: `${categoria} ${citta} Italia`, pageToken: pageToken||undefined })
+      });
+      const data = await resp.json();
+      if(data.error) throw new Error(data.error);
+      if(data.places) places.push(...data.places);
+      pageToken = data.nextPageToken || null;
+      pagine++;
+      setLoading(true, `Trovate ${places.length} attività…`);
+    } while(pageToken && pagine < 2);
+
+    // dedup per nome
+    const seen = new Set();
+    places = places.filter(p=>{ const k=(p.displayName?.text||'').toLowerCase(); if(seen.has(k))return false; seen.add(k); return true; });
+    if(!places.length) throw new Error('Nessuna attività trovata. Prova con categoria o città diversa.');
+
+    // normalizza
+    const attivita = places.slice(0,20).map(p=>({
+      nome: p.displayName?.text || 'N/D',
+      indirizzo: p.formattedAddress || 'N/D',
+      telefono: p.nationalPhoneNumber || 'N/D',
+      web: p.websiteUri || null,
+      rating: p.rating || null,
+      nRating: p.userRatingCount || 0,
+      priceLevel: p.priceLevel || null,
+      tipi: p.types || [],
+      status: p.businessStatus
+    }));
+
+    // STEP 2 — analisi AI adattiva (function TERRA)
+    setLoading(true, `Analizzo ${attivita.length} attività e preparo i dossier…`);
+    const aResp = await fetch('/.netlify/functions/analizza', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ profilo, attivita })
+    });
+    const aData = await aResp.json();
+    if(aData.error) throw new Error(aData.error);
+    const analisi = aData.analisi || [];
+
+    // unisci attività + analisi
+    leadsData = attivita.map((a,i)=>({
+      ...a,
+      score: analisi[i]?.score ?? 50,
+      dimensione: analisi[i]?.dimensione || '–',
+      dossier: analisi[i]?.dossier || 'Analisi non disponibile.'
+    }));
+    leadsData.sort((x,y)=> y.score - x.score);
+
+    render();
+  }catch(e){
+    err('Errore: '+e.message);
+    document.getElementById('emptyState').style.display='block';
+  }finally{
+    setLoading(false);
+  }
+}
+
+// ══════════ RENDER ══════════
+function render(){
+  const list = document.getElementById('leadList');
+  document.getElementById('leadCount').textContent = leadsData.length;
+  document.getElementById('resultsHead').classList.add('on');
+  list.innerHTML = leadsData.map(l=>{
+    const cls = l.score>=70?'high':l.score>=45?'mid':'low';
+    const stars = l.rating ? '★'.repeat(Math.round(l.rating))+'☆'.repeat(5-Math.round(l.rating)) : '';
+    const tel = l.telefono!=='N/D' ? `<a href="tel:${l.telefono}">${esc(l.telefono)}</a>` : '';
+    const web = l.web ? `<a href="${esc(l.web)}" target="_blank">sito ↗</a>` : `<span class="badge badge-nosite">senza sito</span>`;
+    return `
+    <div class="lead">
+      <div class="lead-top">
+        <div class="lead-info">
+          <div class="lead-nome">${esc(l.nome)}</div>
+          <div class="lead-meta">
+            ${l.rating?`<span class="lead-stars">${stars}</span> ${l.rating} (${l.nRating})`:'<span style="color:#bbb">nessuna recensione</span>'}
+            ${tel?'· '+tel:''}
+            · ${web}
+          </div>
+          <div class="lead-meta" style="margin-top:0.2rem">${esc(l.indirizzo)}</div>
+        </div>
+        <div class="lead-score">
+          <div class="lead-score-num ${cls}">${l.score}</div>
+          <div class="lead-score-lbl">score</div>
+        </div>
+      </div>
+      <div class="lead-dim">📊 ${esc(l.dimensione)}</div>
+      <div class="lead-dossier">${esc(l.dossier)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════ CSV ══════════
+function exportCSV(){
+  if(!leadsData.length){ toast('Nessun lead da esportare','err'); return; }
+  const head = ['Nome','Indirizzo','Telefono','Sito','Rating','Recensioni','Score','Dimensione stimata','Dossier'];
+  const rows = leadsData.map(l=>[l.nome,l.indirizzo,l.telefono,l.web||'',l.rating||'',l.nRating||'',l.score,l.dimensione,l.dossier]
+    .map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+  const csv = [head.join(','), ...rows].join('\n');
+  const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`terra-lead-${Date.now()}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  toast('CSV esportato ✓');
+}
+
+// ══════════ UTIL ══════════
+function setLoading(on, txt){
+  document.getElementById('loaderState').classList.toggle('on', on);
+  if(txt) document.getElementById('loaderTxt').textContent = txt;
+  document.getElementById('btnCerca').disabled = on;
+}
+function err(m){ const e=document.getElementById('errBox'); e.textContent=m; e.classList.add('on'); }
+function hideErr(){ document.getElementById('errBox').classList.remove('on'); }
+function toast(m,t){ const el=document.getElementById('toast'); el.textContent=m; el.className='toast on '+(t||''); setTimeout(()=>el.className='toast',3000); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+</script>
+</body>
+</html>
